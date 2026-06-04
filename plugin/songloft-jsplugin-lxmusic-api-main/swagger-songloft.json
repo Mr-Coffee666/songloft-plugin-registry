@@ -1,0 +1,639 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Songloft 洛雪音乐 API",
+    "description": "洛雪音源插件 API 适配层，为 TV客户端、xiaomusic 等客户端提供统一的音乐播放能力接口。\n\n## 概述\n本 API 用于服务 Songloft TV 客户端、xiaomusic 等客户端，支持音乐搜索、播放、歌词获取、歌单管理等核心功能。\n\n## Base URL\n`{server_url}/api/v1/plugin/lxmusic-api/`\n\n## 认证方式\n登录后获取 access_token，后续请求通过 `Authorization: Bearer <token>`  Header 携带。\n\n## 音乐来源 (source)\n- `kw` - 酷我音乐\n- `kg` - 酷狗音乐\n- `tx` - QQ音乐\n- `wy` - 网易云音乐\n- `mg` - 咜咕音乐\n\n## 音乐品质 (quality)\n- `flac` - 无损音质\n- `320k` - 高品质 320kbps\n- `128k` - 标准品质 128kbps\n\n## 通用响应格式\n成功响应根据接口不同返回不同数据结构，错误时返回:\n```json\n{ \"message\": \"错误描述\" }\n```",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://{server_url}/api/v1/plugin/lxmusic-api",
+      "description": "Songloft API 端点",
+      "variables": {
+        "server_url": {
+          "default": "localhost:58091"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "登录",
+        "description": "使用用户名密码登录，获取访问令牌",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SongloftLoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MiAuthTokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "tags": ["音乐搜索"],
+        "summary": "搜索音乐",
+        "description": "根据关键词搜索音乐，返回音乐列表",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "搜索关键词"
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "音乐来源，如 kw/kg/tx/wy/mg，不传则搜索全部"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1 },
+            "description": "页码"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20 },
+            "description": "每页数量"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "搜索结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MusicInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/url": {
+      "post": {
+        "tags": ["音乐播放"],
+        "summary": "获取音乐播放链接",
+        "description": "根据歌曲信息获取实际播放URL，支持指定音质",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MusicUrlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "音乐链接",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MusicUrlResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lyric": {
+      "get": {
+        "tags": ["歌词"],
+        "summary": "获取歌词",
+        "description": "获取歌曲歌词，支持原词、翻译、罗马音",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "音乐来源"
+          },
+          {
+            "name": "songmid",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "歌曲MID"
+          },
+          {
+            "name": "quality",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "音质要求"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "歌词信息",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LyricInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hotSearch": {
+      "get": {
+        "tags": ["音乐搜索"],
+        "summary": "获取热搜列表",
+        "description": "获取各平台的热门搜索词",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "音乐来源，不传则返回全部"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "热搜结果"
+          }
+        }
+      }
+    },
+    "/tipSearch": {
+      "get": {
+        "tags": ["音乐搜索"],
+        "summary": "搜索提示",
+        "description": "获取搜索建议/提示",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "搜索提示列表"
+          }
+        }
+      }
+    },
+    "/songList/tags": {
+      "get": {
+        "tags": ["歌单"],
+        "summary": "获取歌单标签",
+        "description": "获取歌单分类标签和排序选项",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "音乐来源"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "标签列表"
+          }
+        }
+      }
+    },
+    "/songList/list": {
+      "get": {
+        "tags": ["歌单"],
+        "summary": "获取歌单列表",
+        "description": "获取歌单广场列表，支持按标签和排序筛选",
+        "parameters": [
+          { "name": "source", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "tagId", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "sortId", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "default": 1 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "歌单列表"
+          }
+        }
+      }
+    },
+    "/songList/detail": {
+      "get": {
+        "tags": ["歌单"],
+        "summary": "获取歌单详情",
+        "description": "获取歌单详细信息，包含歌曲列表",
+        "parameters": [
+          { "name": "source", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "default": 1 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "歌单详情",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Playlist"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/songList/search": {
+      "get": {
+        "tags": ["歌单"],
+        "summary": "搜索歌单",
+        "parameters": [
+          { "name": "source", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "text", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "default": 1 } }
+        ],
+        "responses": {
+          "200": { "description": "搜索结果" }
+        }
+      }
+    },
+    "/leaderboard/boards": {
+      "get": {
+        "tags": ["排行榜"],
+        "summary": "获取排行榜榜单",
+        "description": "获取各平台的排行榜类别",
+        "parameters": [
+          { "name": "source", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "榜单列表" }
+        }
+      }
+    },
+    "/leaderboard/list": {
+      "get": {
+        "tags": ["排行榜"],
+        "summary": "获取排行榜详情",
+        "parameters": [
+          { "name": "source", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "bangid", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "default": 1 } }
+        ],
+        "responses": {
+          "200": { "description": "排行榜内容" }
+        }
+      }
+    },
+    "/comment": {
+      "get": {
+        "tags": ["评论"],
+        "summary": "获取歌曲评论",
+        "parameters": [
+          { "name": "source", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "songmid", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "评论列表" }
+        }
+      }
+    },
+    "/config": {
+      "get": {
+        "tags": ["配置"],
+        "summary": "获取播放器配置",
+        "responses": {
+          "200": { "description": "配置信息" }
+        }
+      }
+    },
+    "/cache/lyric": {
+      "get": {
+        "tags": ["歌词"],
+        "summary": "获取缓存歌词",
+        "parameters": [
+          { "name": "source", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "songmid", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "songId", "in": "query", "required": false, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "歌词内容" }
+        }
+      },
+      "post": {
+        "tags": ["歌词"],
+        "summary": "缓存歌词",
+        "description": "将歌词内容缓存到服务器",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheLyricRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "缓存成功" }
+        }
+      }
+    },
+    "/playlists": {
+      "get": {
+        "tags": ["歌单"],
+        "summary": "获取用户歌单列表",
+        "description": "获取当前登录用户的私有歌单列表",
+        "parameters": [
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 50 } },
+          { "name": "offset", "in": "query", "required": false, "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "歌单列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MiPlaylistListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/playlists/{listId}/songs": {
+      "get": {
+        "tags": ["歌单"],
+        "summary": "获取歌单歌曲",
+        "description": "获取指定歌单中的歌曲列表",
+        "parameters": [
+          {
+            "name": "listId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "歌单ID"
+          },
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "default": 50 } },
+          { "name": "offset", "in": "query", "required": false, "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "歌曲列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MiPlaylistSongsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SongloftLoginRequest": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": { "type": "string", "description": "用户名" },
+          "password": { "type": "string", "description": "密码" }
+        }
+      },
+      "MiAuthTokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": { "type": "string", "description": "访问令牌" },
+          "refresh_token": { "type": "string", "description": "刷新令牌" },
+          "expires_in": { "type": "integer", "description": "过期时间(秒)" },
+          "token_type": { "type": "string", "description": "令牌类型，通常为 Bearer" }
+        }
+      },
+      "MusicInfo": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "音乐ID" },
+          "name": { "type": "string", "description": "歌曲名称" },
+          "singer": { "type": "string", "description": "歌手" },
+          "source": { "type": "string", "description": "来源(kw/kg/tx/wy/mg)" },
+          "interval": { "type": "string", "description": "时长(mm:ss格式)" },
+          "img": { "type": "string", "description": "封面图片URL" },
+          "albumId": { "type": "string", "description": "专辑ID" },
+          "albumName": { "type": "string", "description": "专辑名称" },
+          "songmid": { "type": "string", "description": "歌曲MID(重要，用于获取播放链接和歌词)" },
+          "hash": { "type": "string", "description": "哈希值" },
+          "copyrightId": { "type": "string", "description": "版权ID" },
+          "types": {
+            "type": "array",
+            "description": "音质信息列表",
+            "items": { "$ref": "#/components/schemas/QualityInfo" }
+          },
+          "_types": {
+            "type": "object",
+            "description": "音质详情映射",
+            "additionalProperties": { "$ref": "#/components/schemas/QualityDetail" }
+          },
+          "meta": { "$ref": "#/components/schemas/MusicMeta" },
+          "searchSource": { "type": "string", "description": "搜索来源" }
+        }
+      },
+      "MusicMeta": {
+        "type": "object",
+        "properties": {
+          "songId": { "type": "object", "description": "歌曲ID" },
+          "albumName": { "type": "string", "description": "专辑名称" },
+          "picUrl": { "type": "string", "description": "封面URL" },
+          "qualitys": { "type": "array", "items": { "$ref": "#/components/schemas/QualityInfo" } },
+          "_qualitys": { "type": "object", "additionalProperties": { "$ref": "#/components/schemas/QualityDetail" } }
+        }
+      },
+      "QualityInfo": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "description": "音质类型(flac/320k/128k)" },
+          "size": { "type": "string", "description": "文件大小" }
+        }
+      },
+      "QualityDetail": {
+        "type": "object",
+        "properties": {
+          "size": { "type": "string", "description": "文件大小" }
+        }
+      },
+      "MusicUrlRequest": {
+        "type": "object",
+        "required": ["songInfo", "quality"],
+        "properties": {
+          "songInfo": {
+            "type": "object",
+            "required": ["source", "songmid"],
+            "properties": {
+              "source": { "type": "string", "description": "音乐来源" },
+              "songmid": { "type": "string", "description": "歌曲MID" }
+            }
+          },
+          "quality": { "type": "string", "description": "音质要求(flac/320k/128k)" }
+        }
+      },
+      "MusicUrlResponse": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string", "description": "音乐播放URL" },
+          "type": { "type": "string", "description": "类型" },
+          "source": { "type": "string", "description": "来源" }
+        }
+      },
+      "LyricInfo": {
+        "type": "object",
+        "properties": {
+          "lyric": { "type": "string", "description": "原歌词" },
+          "tlyric": { "type": "string", "description": "翻译歌词" },
+          "rlyric": { "type": "string", "description": "罗马音歌词" },
+          "lxlyric": { "type": "string", "description": "逐字歌词(卡拉OK格式)" }
+        }
+      },
+      "Playlist": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "歌单ID" },
+          "name": { "type": "string", "description": "歌单名称" },
+          "source": { "type": "string", "description": "来源" },
+          "sourceListId": { "type": "string", "description": "源列表ID" },
+          "locationUpdateTime": { "type": "integer", "description": "位置更新时间" },
+          "songs": { "type": "array", "items": { "$ref": "#/components/schemas/MusicInfo" }, "description": "歌曲列表" },
+          "picUrl": { "type": "string", "description": "封面URL" },
+          "img": { "type": "string", "description": "封面图片(备选)" },
+          "desc": { "type": "string", "description": "描述" },
+          "songCount": { "type": "integer", "description": "歌曲数量" },
+          "total": { "type": "string", "description": "总数" },
+          "time": { "type": "string", "description": "时间" },
+          "createTime": { "type": "integer", "description": "创建时间" },
+          "creator": { "type": "string", "description": "创建者" },
+          "author": { "type": "string", "description": "作者" },
+          "playCount": { "type": "integer", "description": "播放次数" },
+          "playCountStr": { "type": "string", "description": "播放次数(字符串)" },
+          "shareCount": { "type": "integer", "description": "分享次数" },
+          "info": { "$ref": "#/components/schemas/PlaylistInfo" },
+          "isDefault": { "type": "boolean", "description": "是否默认列表" },
+          "isLove": { "type": "boolean", "description": "是否收藏列表" }
+        }
+      },
+      "PlaylistInfo": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "img": { "type": "string" },
+          "author": { "type": "string" },
+          "playCount": { "type": "string" },
+          "desc": { "type": "string" },
+          "time": { "type": "string" }
+        }
+      },
+      "CacheLyricRequest": {
+        "type": "object",
+        "required": ["source", "songmid", "lyric"],
+        "properties": {
+          "source": { "type": "string" },
+          "songmid": { "type": "string" },
+          "songId": { "type": "string" },
+          "lyric": { "type": "string" }
+        }
+      },
+      "MiPlaylist": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "歌单ID" },
+          "type": { "type": "string", "description": "类型" },
+          "name": { "type": "string", "description": "歌单名称" },
+          "description": { "type": "string", "description": "描述" },
+          "coverPath": { "type": "string", "description": "封面路径" },
+          "coverUrl": { "type": "string", "description": "封面URL" },
+          "labels": { "type": "array", "items": { "type": "string" }, "description": "标签" },
+          "songCount": { "type": "integer", "description": "歌曲数" },
+          "createdAt": { "type": "string", "description": "创建时间" },
+          "updatedAt": { "type": "string", "description": "更新时间" }
+        }
+      },
+      "MiSong": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "歌曲ID" },
+          "type": { "type": "string", "description": "类型" },
+          "title": { "type": "string", "description": "标题" },
+          "artist": { "type": "string", "description": "艺术家" },
+          "album": { "type": "string", "description": "专辑" },
+          "duration": { "type": "number", "description": "时长(秒)" },
+          "filePath": { "type": "string", "description": "文件路径" },
+          "url": { "type": "string", "description": "URL" },
+          "coverPath": { "type": "string", "description": "封面路径" },
+          "coverUrl": { "type": "string", "description": "封面URL" },
+          "lyric": { "type": "string", "description": "歌词" },
+          "lyricSource": { "type": "string", "description": "歌词来源" },
+          "fileSize": { "type": "integer", "description": "文件大小" },
+          "format": { "type": "string", "description": "格式" },
+          "bitRate": { "type": "integer", "description": "比特率" },
+          "sampleRate": { "type": "integer", "description": "采样率" },
+          "isLive": { "type": "boolean", "description": "是否直播" },
+          "cacheHash": { "type": "string", "description": "缓存哈希" },
+          "addedAt": { "type": "string", "description": "添加时间" },
+          "updatedAt": { "type": "string", "description": "更新时间" }
+        }
+      },
+      "MiPlaylistListResponse": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "integer", "description": "本次返回数量" },
+          "offset": { "type": "integer", "description": "偏移量" },
+          "playlists": { "type": "array", "items": { "$ref": "#/components/schemas/MiPlaylist" }, "description": "歌单列表" }
+        }
+      },
+      "MiPlaylistSongsResponse": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "integer", "description": "本次返回数量" },
+          "offset": { "type": "integer", "description": "偏移量" },
+          "songs": { "type": "array", "items": { "$ref": "#/components/schemas/MiSong" }, "description": "歌曲列表" },
+          "total": { "type": "integer", "description": "总数" }
+        }
+      }
+    }
+  }
+}

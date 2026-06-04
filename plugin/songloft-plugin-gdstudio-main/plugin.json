@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/songloft-org/plugin-toolchain/main/schemas/plugin.schema.json",
+  "name": "GD音乐台",
+  "version": "2026.06.14",
+  "description": "提供基于 GD Studio (music.gdstudio.xyz) 的音乐搜索与高音质下载支持",
+  "author": "Songloft Team",
+  "homepage": "https://github.com/songloft-org/songloft-plugin-gdstudio",
+  "license": "Apache-2.0",
+  "entryPath": "gdstudio",
+  "main": "main.js",
+  "minHostVersion": "1.3.0",
+  "permissions": [
+    "storage",
+    "songs.read"
+  ],
+  "updateUrl": "https://raw.githubusercontent.com/Mr-Coffee666/songloft-plugin-registry/main/plugin/songloft-plugin-gdstudio-main/manifest.json",
+  "entryHash": "",
+  "zipHash": ""
+}

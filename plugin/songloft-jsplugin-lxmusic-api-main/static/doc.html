@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口说明 - 洛雪音乐API</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/fonts.css">
+    <style>
+        body {
+            background: var(--md-surface);
+            color: var(--md-on-surface);
+            min-height: 100vh;
+            margin: 0;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .markdown-body {
+            background: var(--md-surface-container);
+            border-radius: 12px;
+            padding: 32px;
+            line-height: 1.7;
+        }
+        .markdown-body h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--md-outline-variant);
+            color: var(--md-primary);
+        }
+        .markdown-body h2 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            color: var(--md-on-surface);
+        }
+        .markdown-body h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--md-on-surface-variant);
+        }
+        .markdown-body p {
+            margin-bottom: 12px;
+            color: var(--md-on-surface-variant);
+        }
+        .markdown-body ul, .markdown-body ol {
+            padding-left: 24px;
+            margin-bottom: 12px;
+            color: var(--md-on-surface-variant);
+        }
+        .markdown-body li {
+            margin-bottom: 4px;
+        }
+        .markdown-body code {
+            background: var(--md-surface-container-highest);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 13px;
+        }
+        .markdown-body pre {
+            background: var(--md-surface-container-highest);
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+        .markdown-body pre code {
+            background: none;
+            padding: 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .markdown-body th, .markdown-body td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--md-outline-variant);
+        }
+        .markdown-body th {
+            font-weight: 500;
+            background: var(--md-surface-container-high);
+        }
+        .markdown-body a {
+            color: var(--md-primary);
+            text-decoration: none;
+        }
+        .markdown-body a:hover {
+            text-decoration: underline;
+        }
+        .markdown-body blockquote {
+            border-left: 4px solid var(--md-primary);
+            margin: 16px 0;
+            padding: 8px 16px;
+            background: var(--md-surface-container-low);
+            color: var(--md-on-surface-variant);
+        }
+        .markdown-body hr {
+            border: none;
+            border-top: 1px solid var(--md-outline-variant);
+            margin: 24px 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--md-on-surface-variant);
+        }
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: var(--md-error);
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--md-primary);
+            text-decoration: none;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="" class="back-link">
+            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+            返回
+        </a>
+        <div class="markdown-body" id="content">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadMarkdown() {
+            const contentDiv = document.getElementById('content');
+            try {
+                const response = await fetch('static/接口说明.md');
+                if (!response.ok) throw new Error('文件加载失败');
+                const text = await response.text();
+                contentDiv.innerHTML = marked.parse(text);
+            } catch (err) {
+                contentDiv.innerHTML = '<div class="error">加载失败: ' + err.message + '</div>';
+            }
+        }
+        loadMarkdown();
+    </script>
+</body>
+</html>

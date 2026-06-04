@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GD音乐台</title>
+    <link rel="stylesheet" href="static/css/fonts.css">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <!-- AppBar -->
+    <header class="app-bar">
+        <span class="material-symbols-outlined">library_music</span>
+        <h1>GD音乐台</h1>
+        <button class="btn-icon" id="refreshBtn" title="刷新">
+            <span class="material-symbols-outlined">refresh</span>
+        </button>
+    </header>
+
+    <!-- Tab 1: 发现与搜索 -->
+    <div class="tab-content active" id="tab-browser">
+        <div class="container">
+            <!-- 发现与搜索区 -->
+            <div class="card">
+                <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="text" class="text-field" id="searchInput" placeholder="搜索歌手、歌曲..." style="flex:1">
+                        <button class="btn-filled" id="searchBtn" style="padding:0 16px;">搜索</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 音乐列表 -->
+            <div class="card" id="listCard" style="margin-top:16px; display:none;">
+                <div class="card-header" style="padding-bottom:8px">
+                    <div style="display:flex;align-items:center;gap:8px;width:100%">
+                        <div style="flex:1;font-size:14px;color:var(--md-on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="browserPathDisplay">搜索结果</div>
+                        <button class="btn-text" id="toggleSelectModeBtn" style="display:none;">
+                            <span class="material-symbols-outlined">checklist</span> 多选
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" id="browserList" style="padding-top:0">
+                    <div class="empty-state">请输入关键词搜索歌曲</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: 插件配置 -->
+    <div class="tab-content" id="tab-config">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <span class="material-symbols-outlined">settings</span>
+                    基础设置
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">默认音源 (Source)</label>
+                        <select id="configSource" class="select-field">
+                            <option value="netease">网易云 (netease)</option>
+                            <option value="kuwo">酷我 (kuwo)</option>
+                            <option value="joox">JOOX (joox)</option>
+                        </select>
+                        <div class="card-desc" style="padding: 0; margin-top: 4px;">搜索和播放时默认使用的音乐来源</div>
+                    </div>
+                    <div class="form-group" style="margin-top:16px;">
+                        <label class="form-label">解析音质 (Bitrate)</label>
+                        <select id="configBr" class="select-field">
+                            <option value="128">标准 (128k)</option>
+                            <option value="320">极高 (320k)</option>
+                            <option value="999">无损/Hi-Res (999)</option>
+                        </select>
+                        <div class="card-desc" style="padding: 0; margin-top: 4px;">请求直链时使用的音质参数</div>
+                    </div>
+                    <div class="toolbar" style="padding:16px 0 0;justify-content:flex-end;gap:8px; background: transparent; border-bottom: none;">
+                        <button class="btn-filled" id="saveConfigBtn">
+                            <span class="material-symbols-outlined">save</span>
+                            保存配置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar">
+        <button class="tab-item active" data-tab="browser">
+            <span class="material-symbols-outlined">search</span>
+            <span>搜索发现</span>
+        </button>
+        <button class="tab-item" data-tab="config">
+            <span class="material-symbols-outlined">settings</span>
+            <span>插件设置</span>
+        </button>
+    </nav>
+
+    <!-- FAB (Floating Action Bar) -->
+    <div id="fabContainer" class="fab-container">
+        <div style="display:flex;align-items:center;gap:12px;width:100%;">
+            <span id="fabSelectionCount" style="font-weight:500;font-size:14px;flex:1;">已选 0 项</span>
+            <button class="btn-text" id="fabCancelBtn" style="color:var(--md-on-surface)">取消</button>
+            <button class="btn-filled" id="fabImportBtn">
+                <span class="material-symbols-outlined" style="font-size:18px;">cloud_download</span> 直接入库
+            </button>
+        </div>
+    </div>
+
+    <!-- Snackbar -->
+    <div id="snackbar" class="snackbar"></div>
+
+    <!-- Progress Dialog -->
+    <div id="progressDialog" class="dialog-overlay">
+        <div class="dialog" style="max-width: 320px;text-align:center;">
+            <div class="dialog-title" id="progressTitle">正在处理</div>
+            <div class="dialog-content" style="padding:24px 0;">
+                <div class="spinner"></div>
+                <div id="progressText" style="margin-top:16px;color:var(--md-on-surface-variant);font-size:14px;">请稍候...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="static/js/app.js"></script>
+</body>
+</html>

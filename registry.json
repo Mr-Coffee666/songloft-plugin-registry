@@ -1,0 +1,8 @@
+{
+  "name": "coffee Songloft Plugin Registry",
+  "plugins": [
+    "https://raw.githubusercontent.com/Mr-Coffee666/songloft-plugin-registry/main/plugin/songloft-jsplugin-lxmusic-api-main/plugin.json",
+    "https://raw.githubusercontent.com/Mr-Coffee666/songloft-plugin-registry/main/plugin/songloft-jsplugin-lxmusic-main/plugin.json",
+    "https://raw.githubusercontent.com/Mr-Coffee666/songloft-plugin-registry/main/plugin/songloft-plugin-gdstudio-main/plugin.json"
+  ]
+}

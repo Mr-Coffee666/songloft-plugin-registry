@@ -1,0 +1,17 @@
+{
+  "name": "gdstudio",
+  "version": "1.0.0",
+  "description": "通过 GD Studio 接口提供音乐搜索与下载",
+  "private": true,
+  "scripts": {
+    "build": "songloft-plugin build",
+    "dev": "songloft-plugin dev",
+    "validate": "songloft-plugin validate",
+    "publish:release": "songloft-plugin publish"
+  },
+  "devDependencies": {
+    "@songloft/plugin-builder": "^2.0.0-alpha.1",
+    "@songloft/plugin-sdk": "^2.0.0-alpha.1",
+    "typescript": "^5.9.3"
+  }
+}

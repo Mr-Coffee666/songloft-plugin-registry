@@ -1,0 +1,19 @@
+{
+  "name": "lxmusic-api",
+  "version": "2026.5.27",
+  "description": "洛雪音乐API - TV客户端、xiaomusic 等客户端统一API适配层",
+  "private": true,
+  "scripts": {
+    "build": "songloft-plugin build",
+    "dev": "songloft-plugin dev",
+    "validate": "songloft-plugin validate"
+  },
+  "devDependencies": {
+    "@songloft/plugin-builder": "^2.0.0-alpha.1",
+    "@songloft/plugin-sdk": "^2.0.0-alpha.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@songloft/musicsdk": "^2.0.0-alpha.1"
+  }
+}

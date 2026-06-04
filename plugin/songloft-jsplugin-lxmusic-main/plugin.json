@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/songloft-org/plugin-toolchain/main/schemas/plugin.schema.json",
+  "name": "洛雪音源",
+  "version": "2026.06.14",
+  "description": "洛雪音源 - 多平台音乐搜索、歌单管理、音源管理",
+  "author": "LX Team",
+  "homepage": "",
+  "license": "Apache-2.0",
+  "entryPath": "lxmusic",
+  "main": "main.js",
+  "minHostVersion": "2.0.0",
+  "permissions": [
+    "storage",
+    "songs.read",
+    "songs.write",
+    "playlists.read",
+    "playlists.write",
+    "jsenv"
+  ],
+  "updateUrl": "https://raw.githubusercontent.com/Mr-Coffee666/songloft-plugin-registry/main/plugin/songloft-jsplugin-lxmusic-main/manifest.json",
+  "entryHash": "",
+  "zipHash": ""
+}

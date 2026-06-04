@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>洛雪音乐API</title>
+    <link rel="stylesheet" href="static/css/fonts.css">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+<!-- AppBar -->
+<header class="app-bar">
+    <h1>洛雪音乐API</h1>
+</header>
+
+<div class="container">
+    <!-- 依赖检查警告 - 未安装 -->
+    <div id="lxmusicWarning_notInstalled" class="card" style="display: none; border-left: 4px solid var(--md-error);">
+        <div class="card-body" style="padding: 16px 20px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <span class="material-symbols-outlined" style="color: var(--md-error); font-size: 24px; flex-shrink: 0;">error</span>
+                <div>
+                    <h3 style="font-size: 14px; font-weight: 500; color: var(--md-error); margin-bottom: 4px;">未安装洛雪音源插件</h3>
+                    <p style="font-size: 13px; color: var(--md-on-surface-variant); line-height: 1.5;">
+                        本插件需要 <strong>洛雪音源插件</strong> 提供音乐 URL 和歌词获取能力。<br>
+                        请先 <a href="https://github.com/songloft-org/songloft-plugin-lxmusic/releases" target="_blank" style="color: var(--md-primary);">下载安装洛雪音源插件</a>（需要 v2026.5.12 及以上版本）。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 依赖检查警告 - 未启用 -->
+    <div id="lxmusicWarning_notEnabled" class="card" style="display: none; border-left: 4px solid var(--md-error);">
+        <div class="card-body" style="padding: 16px 20px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <span class="material-symbols-outlined" style="color: var(--md-error); font-size: 24px; flex-shrink: 0;">toggle_off</span>
+                <div>
+                    <h3 style="font-size: 14px; font-weight: 500; color: var(--md-error); margin-bottom: 4px;">洛雪音源插件未启用</h3>
+                    <p style="font-size: 13px; color: var(--md-on-surface-variant); line-height: 1.5;">
+                        洛雪音源插件已安装但未启用。请在插件管理中启用洛雪音源插件。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 依赖检查警告 - 版本过低 -->
+    <div id="lxmusicWarning_oldVersion" class="card" style="display: none; border-left: 4px solid var(--md-error);">
+        <div class="card-body" style="padding: 16px 20px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <span class="material-symbols-outlined" style="color: var(--md-error); font-size: 24px; flex-shrink: 0;">system_update</span>
+                <div>
+                    <h3 style="font-size: 14px; font-weight: 500; color: var(--md-error); margin-bottom: 4px;">洛雪音源插件版本过低</h3>
+                    <p style="font-size: 13px; color: var(--md-on-surface-variant); line-height: 1.5;">
+                        当前版本: <span id="currentVersion" style="font-weight: 500;"></span> 低于要求的: <span style="color: var(--md-error); font-weight: 500;">v2026.5.12</span> 。<br>
+                        请 <a href="https://github.com/songloft-org/songloft-plugin-lxmusic/releases" target="_blank" style="color: var(--md-primary);">更新洛雪音源插件</a> 至最新版本。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 欢迎卡片 -->
+    <div class="card">
+        <div class="card-header">
+            <span class="material-symbols-outlined">info</span>
+            关于插件
+
+            <span class="version-chip">v2026.5.25</span>
+        </div>
+        <div class="card-body">
+            <p class="card-desc" style="margin-bottom: 12px;">
+                洛雪音乐API 是 洛雪音源插件 的 API 适配层，为 TV客户端、xiaomusic 等客户端提供统一API。
+            </p>
+        </div>
+    </div>
+
+    <!-- 使用说明 -->
+    <div class="card">
+        <div class="card-header">
+            <span class="material-symbols-outlined">help</span>
+            使用说明
+        </div>
+        <div class="card-body">
+            <p class="card-desc">
+                <strong>快速开始：</strong><br>
+                1. 在插件市场安装并启用本插件<br>
+                2. 下载并安装 TV客户端 或 xiaomusic 客户端<br>
+                3. 在客户端登录界面填写接口地址和账号密码<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;示例接口：<code style="background: var(--md-surface-1); padding: 2px 6px; border-radius: 4px;">http://localhost:58091/api/v1/</code><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;账号密码：与网页端一致
+            </p>
+        </div>
+    </div>
+
+    <!-- TV客户端 -->
+    <div class="card">
+        <div class="card-header">
+            <span class="material-symbols-outlined">smart_display</span>
+            关联客户端
+        </div>
+        <div class="card-body">
+            <div class="links-section">
+                <a href="https://github.com/boluofan/music-tv/releases" target="_blank" class="link-item">
+                    <div class="link-icon">
+                        <span class="material-symbols-outlined">smart_display</span>
+                    </div>
+                    <div class="link-content">
+                        <div class="link-title">TV 客户端（v2.0.0以上）</div>
+                        <div class="link-url">github.com/boluofan/music-tv/releases</div>
+                    </div>
+                    <div class="link-arrow">
+                        <span class="material-symbols-outlined">open_in_new</span>
+                    </div>
+                </a>
+                <a href="https://github.com/hanxi/xiaomusic/releases" target="_blank" class="link-item">
+                    <div class="link-icon">
+                        <span class="material-symbols-outlined">smart_toy</span>
+                    </div>
+                    <div class="link-content">
+                        <div class="link-title">xiaomusic（暂未支持）</div>
+                        <div class="link-url">https://github.com/hanxi/xiaomusic/releases</div>
+                    </div>
+                    <div class="link-arrow">
+                        <span class="material-symbols-outlined">open_in_new</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 接口文档 -->
+    <div class="card">
+        <div class="card-header">
+            <span class="material-symbols-outlined">api</span>
+            接口文档
+        </div>
+        <div class="card-body">
+            <div class="links-section">
+                <a href="static/doc.html" target="_blank" class="link-item">
+                    <div class="link-icon">
+                        <span class="material-symbols-outlined">description</span>
+                    </div>
+                    <div class="link-content">
+                        <div class="link-title">接口说明.md</div>
+                        <div class="link-desc">第三方接入接口规范文档</div>
+                    </div>
+                    <div class="link-arrow">
+                        <span class="material-symbols-outlined">open_in_new</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 依赖说明 -->
+    <div class="card">
+        <div class="card-header">
+            <span class="material-symbols-outlined" style="color: var(--md-error); font-size: 24px; flex-shrink: 0;">warning</span>
+            重要提示
+        </div>
+        <div class="card-body">
+            <p class="card-desc">
+                本插件依赖 <strong>洛雪音源插件</strong> 提供音乐 URL 和歌词获取能力。<br>
+                使用前请确保已安装并启用洛雪音源插件，同时导入相应的音源脚本。<br>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    洛雪音乐API · 2026
+</div>
+
+<script>
+(function() {
+    // 获取认证令牌
+    function getAuthToken() {
+        try {
+            var authData = localStorage.getItem('songloft-auth');
+            if (authData) {
+                var parsed = JSON.parse(authData);
+                return parsed.accessToken || '';
+            }
+        } catch (e) {}
+        return '';
+    }
+
+    // 页面加载时检查依赖（直接调用主程序 API）
+    var token = getAuthToken();
+    var headers = {};
+    if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
+    }
+
+    // 尝试从 URL 获取 token（auth-bridge 注入的）
+    var urlParams = new URLSearchParams(window.location.search);
+    var accessToken = urlParams.get('access_token');
+    if (accessToken && !token) {
+        token = accessToken;
+        headers['Authorization'] = 'Bearer ' + accessToken;
+    }
+
+    if (!token) {
+        // 未登录，不显示警告（让用户登录后再访问）
+        return;
+    }
+
+    fetch('/api/v1/jsplugins', { headers: headers })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('获取插件列表失败');
+            }
+            return response.json();
+        })
+        .then(function(data) {
+            var plugins = data.plugins || [];
+            // 查找 lxmusic 插件
+            var lxmusicPlugin = null;
+            for (var i = 0; i < plugins.length; i++) {
+                if (plugins[i].entry_path === 'lxmusic') {
+                    lxmusicPlugin = plugins[i];
+                    break;
+                }
+            }
+
+            if (!lxmusicPlugin) {
+                // 未安装
+                document.getElementById('lxmusicWarning_notInstalled').style.display = 'block';
+            } else if (lxmusicPlugin.status !== 'active') {
+                // 未启用
+                document.getElementById('lxmusicWarning_notEnabled').style.display = 'block';
+            } else {
+                // 检查版本
+                var currentVersion = lxmusicPlugin.version || '0';
+                var requiredVersion = '2026.5.12';
+                if (compareVersion(currentVersion, requiredVersion) < 0) {
+                    document.getElementById('currentVersion').textContent = 'v' + currentVersion;
+                    document.getElementById('lxmusicWarning_oldVersion').style.display = 'block';
+                }
+            }
+        })
+        .catch(function(err) {
+            console.error('检查依赖失败:', err);
+            // 网络错误等，不显示警告避免误报
+        });
+
+    // 版本比较函数：a >= b 返回 1，a < b 返回 -1
+    function compareVersion(a, b) {
+        var partsA = a.split('.').map(Number);
+        var partsB = b.split('.').map(Number);
+        for (var i = 0; i < 3; i++) {
+            var vA = partsA[i] || 0;
+            var vB = partsB[i] || 0;
+            if (vA > vB) return 1;
+            if (vA < vB) return -1;
+        }
+        return 0;
+    }
+})();
+</script>
+
+</body>
+</html>

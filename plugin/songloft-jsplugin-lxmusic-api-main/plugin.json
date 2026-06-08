@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/songloft-org/plugin-toolchain/main/schemas/plugin.schema.json",
   "name": "洛雪音乐API",
-  "version": "2026.06.14",
+  "version": "2026.06.08",
   "description": "洛雪音乐API - TV客户端、xiaomusic 等客户端统一API适配层",
-  "author": "LX Team",
-  "homepage": "",
+  "author": "Mr-Coffee666",
+  "homepage": "https://github.com/Mr-Coffee666/songloft-plugin-registry/tree/main/plugin/songloft-jsplugin-lxmusic-api-main",
   "license": "Apache-2.0",
   "entryPath": "lxmusic-api",
   "main": "main.js",

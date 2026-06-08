@@ -32,3 +32,4 @@ music-lib/
 /.claude/
 /dist/
 node_modules/
+.songloft-dev.json

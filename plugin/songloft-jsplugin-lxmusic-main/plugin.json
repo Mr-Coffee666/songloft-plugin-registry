@@ -17,6 +17,7 @@
     "playlists.write",
     "jsenv"
   ],
+  "download_url": "https://github.com/Mr-Coffee666/songloft-plugin-registry/releases/download/lxmusic-v2026.06.08/lxmusic.jsplugin.zip",
   "updateUrl": "https://raw.githubusercontent.com/Mr-Coffee666/songloft-plugin-registry/main/plugin/songloft-jsplugin-lxmusic-main/manifest.json",
   "entryHash": "",
   "zipHash": ""

@@ -440,6 +440,117 @@ export function registerSearchHandlers(
     return successResponse(responseData);
   });
 
+  // POST /api/search/topone — kw和tx并发搜索，谁先搜到优先返回，整体超时6s
+  // 返回值符合外部搜索接口规范（EXTERNAL_SEARCH_SPEC）
+  router.post('/api/search/topone', async (req: HTTPRequest) => {
+    const startTs = Date.now();
+    const body = parseBody(req);
+    const keyword = String(body.keyword || '').trim();
+    const quality = String(body.quality || '320k').trim();
+
+    if (!keyword) {
+      songloft.log.info(`[JS][plugin] ========== /api/search/topone 参数错误: keyword为空`);
+      return errorResponse(400, '缺少 keyword');
+    }
+
+    songloft.log.info(`[JS][plugin] ========== /api/search/topone 开始: keyword="${keyword}"`);
+
+    const kw = registry.get('kw');
+    const tx = registry.get('tx');
+
+    if (!kw && !tx) {
+      songloft.log.info(`[JS][plugin] ========== /api/search/topone 失败: keyword="${keyword}" 原因=kw和tx平台均不可用 totalMs=${Date.now() - startTs}`);
+      return errorResponse(500, 'kw和tx平台均不可用');
+    }
+
+    let found: { platform: string; item: Record<string, unknown> } | null = null;
+    let kwDone = false;
+    let txDone = false;
+    let resolved = false; // 防止超时后回调再 resolve
+
+    const resultPromise = new Promise<{ platform: string; item: Record<string, unknown> } | null>((resolve) => {
+      function tryFinish() {
+        if (resolved) return;
+        if (found) { resolved = true; resolve(found); return; }
+        if (kwDone && txDone) { resolved = true; resolve(null); }
+      }
+
+      if (kw) {
+        kw.search(keyword, 1, 1).then(r => {
+          if (resolved || found) return;
+          const items = ((r as any)?.list || (r as any)?.songs || []) as Record<string, unknown>[];
+          if (items[0]) found = { platform: 'kw', item: items[0] };
+          kwDone = true;
+          tryFinish();
+        }).catch(() => {
+          kwDone = true;
+          tryFinish();
+        });
+      } else {
+        kwDone = true;
+      }
+
+      if (tx) {
+        tx.search(keyword, 1, 1).then(r => {
+          if (resolved || found) return;
+          const items = ((r as any)?.list || (r as any)?.songs || []) as Record<string, unknown>[];
+          if (items[0]) found = { platform: 'tx', item: items[0] };
+          txDone = true;
+          tryFinish();
+        }).catch(() => {
+          txDone = true;
+          tryFinish();
+        });
+      } else {
+        txDone = true;
+      }
+
+      tryFinish();
+    });
+
+    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => {
+      resolved = true;
+      resolve(null);
+    }, 6000));
+
+    const winner = await Promise.race([resultPromise, timeoutPromise]);
+
+    if (!winner) {
+      songloft.log.info(`[JS][plugin] ========== /api/search/topone 未找到: keyword="${keyword}" totalMs=${Date.now() - startTs}`);
+      return errorResponse(404, '未找到歌曲');
+    }
+
+    const sr = toSearchResultItem(winner.item, winner.platform, quality);
+    if (!sr) {
+      songloft.log.info(`[JS][plugin] ========== /api/search/topone 格式异常: platform=${winner.platform} keyword="${keyword}" totalMs=${Date.now() - startTs}`);
+      return errorResponse(500, '搜索结果格式异常');
+    }
+
+    let url = '';
+    try {
+      const sd = sr.source_data as unknown as LxSourceData;
+      // getMusicUrl 也加 10s 超时，避免整体响应长时间阻塞
+      const musicUrlPromise = runtimeManager.getMusicUrl(sd.platform, quality, sd.songInfo);
+      const urlTimeoutPromise = new Promise<string | null>((resolve) => setTimeout(() => resolve(null), 10000));
+      const resolvedUrl = await Promise.race([musicUrlPromise, urlTimeoutPromise]);
+      if (resolvedUrl) url = resolvedUrl;
+    } catch {
+      // URL解析失败不影响搜索结果返回
+    }
+
+    songloft.log.info(`[JS][plugin] ========== /api/search/topone 成功: platform=${winner.platform} title="${sr.title}" url="${url}" totalMs=${Date.now() - startTs}`);
+
+    return successResponse({
+      title: sr.title,
+      artist: sr.artist,
+      album: sr.album,
+      duration: sr.duration,
+      cover_url: sr.cover_url,
+      url,
+      source_data: sr.source_data,
+    });
+  });
+
   // ===== Direct 接口:供 lxmusic-api 等使用 platform 原始字段的插件调用 =====
   // 不接受 source_data,直接用 songInfo+quality 调底层 musicsdk。
   // 这些接口形态保持不变,跟 source_data 重构正交。
